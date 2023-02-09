@@ -1,18 +1,41 @@
-import React, {useContext} from 'react';
-import CartContext from '../../store/cart-context';
-import CartToggleContext from '../../store/cart-toggle-context';
+import React, { useContext, useEffect, useState } from "react";
+import CartContext from "../../store/cart-context";
+import CartToggleContext from "../../store/cart-toggle-context";
 
 import CartIcon from "../Cart/CartIcon";
 import classes from "./HeaderCartButton.module.css";
 
 const HeaderCartButton = (props) => {
+  const [btnIsHighlighted, setBtnIsHighlighted] = useState(false);
   const cartContext = useContext(CartContext);
   const cartToggleContext = useContext(CartToggleContext);
-  
-  const numberOfCartItems = cartContext.items.reduce((acc, curr) => acc + curr.amount, 0);
+
+  const { items } = cartContext;
+
+  const numberOfCartItems = items.reduce((acc, curr) => acc + curr.amount, 0);
+
+  const btnClasses = `${classes.button} ${
+    btnIsHighlighted ? classes.bump : ""
+  }`;
+
+  useEffect(() => {
+    if (cartContext.items.length === 0) {
+      return;
+    }
+
+    setBtnIsHighlighted(true);
+
+    const timer = setTimeout(() => {
+      setBtnIsHighlighted(false);
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [items]);
 
   return (
-    <button className={classes.button} onClick={cartToggleContext.onShowCart}>
+    <button className={btnClasses} onClick={cartToggleContext.onShowCart}>
       <span className={classes.icon}>
         <CartIcon />
       </span>
